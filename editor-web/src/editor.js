@@ -86,6 +86,7 @@ import { GFM } from '@lezer/markdown';
 import { search, searchKeymap, highlightSelectionMatches, openSearchPanel } from '@codemirror/search';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { changeListIndent } from './list-indent.js';
 
 // ─── Bridge ────────────────────────────────────────────────────────────────
 
@@ -835,6 +836,28 @@ const formattingKeymap = [
   { key: 'Mod-s', run: () => { sendToBridge('requestSave'); return true; } },
 ];
 
+// ─── List indentation keymap ───────────────────────────────────────────────
+// Tab / Shift-Tab indent or dedent list entries by 4 spaces. The key is only
+// consumed when the cursor/selection touches a list line — otherwise returns
+// false so non-list lines keep their default behavior.
+
+function indentListEntry(view, direction) {
+  const spec = changeListIndent(view.state, direction);
+  if (!spec) return false;
+  if (!spec.changes.empty) {
+    view.dispatch({
+      ...spec,
+      userEvent: direction > 0 ? 'input.indent' : 'delete.dedent',
+    });
+  }
+  return true;
+}
+
+const listIndentKeymap = [
+  { key: 'Tab', run: (v) => indentListEntry(v, 1) },
+  { key: 'Shift-Tab', run: (v) => indentListEntry(v, -1) },
+];
+
 // ─── Theme (CSS) ───────────────────────────────────────────────────────────
 
 const editorTheme = EditorView.theme({
@@ -1362,7 +1385,7 @@ function initEditor(initialContent = '') {
     doc: initialContent,
     extensions: [
       history(),
-      keymap.of([...blockMathNavKeymap, ...formattingKeymap, ...searchKeymap, ...defaultKeymap, ...historyKeymap]),
+      keymap.of([...listIndentKeymap, ...blockMathNavKeymap, ...formattingKeymap, ...searchKeymap, ...defaultKeymap, ...historyKeymap]),
       markdown({ extensions: GFM, codeLanguages: findLanguage }),
       syntaxHighlighting(markdownHighlightStyle),
       syntaxHighlighting(defaultHighlightStyle),  // Code block syntax colors

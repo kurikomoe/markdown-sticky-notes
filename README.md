@@ -26,6 +26,7 @@ A native macOS sticky note app with Obsidian-style markdown live preview, built 
 | Cmd+N | New note |
 | Cmd+Shift+P | Pin on top |
 | Cmd+B / I / K | Bold / Italic / Link |
+| Tab / Shift+Tab | Indent / dedent a list item |
 | Cmd+F | Find in note |
 | Cmd+Shift+F | Find and replace |
 | Cmd+` | Cycle through notes |
