@@ -33,7 +33,10 @@ mkdir -p "$RESOURCES_DIR"
 cp ".build/release/$APP_NAME" "$MACOS_DIR/$APP_NAME"
 
 # Copy resources
-cp -R "Sources/StickyNotes/Resources/" "$RESOURCES_DIR/"
+# Use /bin/cp explicitly: BSD cp copies the contents of a trailing-slash
+# source directory, while Homebrew GNU/uutils cp would create an extra
+# Resources/Resources level. The app loads Contents/Resources/Editor/...
+/bin/cp -R "Sources/StickyNotes/Resources/" "$RESOURCES_DIR/"
 
 # Create Info.plist
 cat > "$CONTENTS_DIR/Info.plist" << EOF
